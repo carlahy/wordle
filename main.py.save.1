@@ -24,39 +24,31 @@ def get_input(words):
 def get_init_letter_map():
   return np.zeros((5,26), dtype=int)
 
-def get_guess(strategy, words, criteria=[]):
+def guess(strategy, words):
   match strategy:
-    case 1: 
-      return guess_random(words)
-    case 2: 
-      return guess_elimination(words, criteria)
-    case 3: 
-      return guess_multistart(words)
-    case 4: 
-      return guess_vowels(words)
-    case 5: 
-      return guess_frequency(words)
-    case _: 
-      return guess_random(words)
+    case 1: return guess_random(words)
+    case 2: return guess_elimination(words)
+    case 3: return guess_multistart(words)
+    case 4: return guess_vowels(words)
+    case 5: return guess_frequency(words)
+    case _: return guess_random(words)
 
 def guess_random(words):
   return random.choice(words)
 
 def guess_elimination(words, criteria):
-  words = filter_words(words, criteria)
-  return random.choice(words), words
+  return update_words(words, criteria)
 
 # Updates the list of words by removing words that do not fit the criteria
 # Criteria is a list of lists with the form (char l, int i, int s):
 # l is a letter in the word, i is the position of c within the word, and s is the state of the letter.
 # This can be 0: not in word, 1: in word but not at index i, 2: in word at index i
-def filter_words(words, criteria):
+def update_words(words, criteria):
   filtered = []
   for c in criteria:
     l = c[0]
     i = c[1]
     s = c[2]
-    print('Out of bounds!!! ' + str(i))
     if s == 0:
       filtered = filter(lambda word: l not in word, words)
     elif s == 1:
@@ -76,7 +68,8 @@ def play_strategy(strategy):
   words = all_words
   answer = get_input(words)
   turns = 1
-  guess, words = get_guess(strategy, words)
+  guess = guess_random(words)
+  progress = get_init_letter_map()
  
   while turns <= 6:
     print('Guess ' + str(turns) + '= ' + guess)
@@ -96,8 +89,9 @@ def play_strategy(strategy):
       else: # gray
         accuracy.append(-1)
         criteria.append([letter, i, 0])
-    guess, words = get_guess(strategy, words, criteria)
+    words = update_words(words, criteria)
     turns = turns + 1
+    guess = random.choice(words)
 
   if guess == answer:
     print('Hoorah! Answer = ' +answer)

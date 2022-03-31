@@ -1,0 +1,16 @@
+import random
+import numpy as np
+
+def err(msg):
+  print('Error: ' + msg)
+
+def read_dict():
+  with open('five_letter_words.csv', 'r') as file:
+    words = file.read().split('\n')
+  return words
+
+def get_input(words):
+  while True:
+    answer = input('Enter a 5-letter word: ')  
+    if len(answer) != 5:
+      err('word must be 5-letters long')
